@@ -19,21 +19,22 @@ import csv
 from data_loader import DataLoader
 import numpy as np
 import os
+from keras.utils.training_utils import multi_gpu_model
 
 import argparse
 
 from keras.utils.training_utils import multi_gpu_model
 from keras.models import load_model
 
-mypath = '/home/taekwang0094/WorkSpace/Keras-GAN/cyclegan/saved_model2'
+#mypath = '/home/taekwang0094/WorkSpace/Keras-GAN/cyclegan/saved_model2'
 
 def parser_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--save_path', default='/disk2/taekwang/GANresult/saved_model')
-    parser.add_argument('--dataset_name', default='fogdata_9000')
+    parser.add_argument('--save_path', default='/disk2/taekwang/GANresult/saved_model_9000_1')
+    parser.add_argument('--dataset_name', default='fogdata_9000_1')
     parser.add_argument('--dataset_path', default='/disk2/taekwang/GANdataset')
     parser.add_argument('--epoch', default=100)
-    parser.add_argument('--batch_size', default=1)
+    parser.add_argument('--batch_size', default=16)
 
     return parser.parse_args()
 
@@ -196,7 +197,8 @@ class CycleGAN():
         d3 = d_layer(d2, self.df * 4)
         d4 = d_layer(d3, self.df * 8)
 
-        validity = Conv2D(1, kernel_size=4, strides=1, padding='same')(d4)
+        validity = Conv2D(1, kernel_size=4, strides=1, padding='same')(d4) # PatchGAN
+        # PatchGAN을 사용하지 않으면 Flatten 하고 Dense(1)로 처리해야함.
         model_tmp = Model(img, validity)
         model_ = ModelMGPU(model_tmp, gpus=4)
         return model_
@@ -264,7 +266,7 @@ class CycleGAN():
             # dB_json = self.d_B.to_json()
             # gAB_json = self.g_AB.to_json()
             # gBA_json = self.g_BA.to_json()
-            if epoch % 10 == 0:
+            if epoch % 5 == 0:
                 self.g_AB.save(os.path.join(self.args.save_path, 'g_AB_{}.h5'.format(epoch)))
                 self.g_BA.save(os.path.join(self.args.save_path, 'g_BA_{}.h5'.format(epoch)))
                 self.d_A.save(os.path.join(self.args.save_path, 'd_A_{}.h5'.format(epoch)))
@@ -327,4 +329,4 @@ if __name__ == '__main__':
 
     args2 = parser_args()
     gan = CycleGAN()
-    gan.train(epochs=args2.epoch, batch_size=args2.batch_size, sample_interval=100)
+    gan.train(epochs=int(args2.epoch), batch_size=int(args2.batch_size), sample_interval=100)

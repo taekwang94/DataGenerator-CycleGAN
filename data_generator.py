@@ -35,9 +35,10 @@ def parser_args():
 
     parser.add_argument('--load_model_path', default='/disk2/taekwang/GANresult/saved_model')
     parser.add_argument('--dataset_path', default='/disk2/taekwang/GANdataset')
-    parser.add_argument('--dataset_name', default='fogdata_1')
+   # parser.add_argument('--dataset_name', default='fogdata_1')
+    parser.add_argument('--dataset_name', default='fogtest')
     parser.add_argument('--data_save_path', default='/disk2/taekwang/GANresult')
-    parser.add_argument('--modelEpoch_num', default=10)
+    parser.add_argument('--modelEpoch_num', default=100)
     parser.add_argument('--isConcat', default=False)
 
 
